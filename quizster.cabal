@@ -1,0 +1,78 @@
+name:                quizster
+version:             0.1.0.0
+synopsis:            Programming Quiz API
+description:         Programming Quiz API
+license:             MIT
+license-file:        LICENSE
+author:              Kieran Trezona-le Comte
+maintainer:          trezona.lecomte@gmail.com
+copyright:           2016 Powershop NZ Ltd.
+category:            Web
+build-type:          Simple
+cabal-version:       >=1.18
+
+source-repository head
+    type:
+        git
+    location:
+        https://www.github.com/trezona-lecomte/quizster
+
+executable quizster-exe
+    main-is:
+        Main.hs
+    build-depends:
+        base >=4.7 && <4.9
+      , quizster
+      , persistent-postgresql
+      , wai
+      , warp
+      , monad-logger
+    hs-source-dirs:
+        app
+    default-language:
+        Haskell2010
+
+library
+    default-language:
+        Haskell2010
+    hs-source-dirs:
+        src
+    exposed-modules:
+        Config
+      , Models
+      , Api
+    build-depends:
+        base >= 4.7 && < 4.9
+      , servant >= 0.5 && < 0.6
+      , servant-server >= 0.5 && < 0.6
+      , persistent
+      , persistent-postgresql
+      , persistent-template
+      , wai
+      , bytestring
+      , wai-extra
+      , warp
+      , aeson
+      , mtl
+      , monad-logger
+      , transformers
+      , monad-control
+
+test-suite servant-persistent-test
+    type:
+        exitcode-stdio-1.0
+    hs-source-dirs:
+        test
+    main-is:
+        Spec.hs
+    other-modules:
+        ApiSpec
+    build-depends:
+        base
+      , quizster
+      -- , QuickCheck
+      , hspec
+    ghc-options:
+        -threaded -rtsopts -with-rtsopts=-N
+    default-language:
+        Haskell2010

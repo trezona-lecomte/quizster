@@ -1,0 +1,8 @@
+flags: {}
+packages:
+- '.'
+extra-deps:
+- servant-0.5
+- servant-server-0.5
+- text-1.2.2.1
+resolver: lts-5.11
