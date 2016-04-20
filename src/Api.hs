@@ -8,6 +8,7 @@ module Api where
 import Control.Monad.Except
 import Control.Monad.Reader.Class
 import Control.Monad.Reader         ( ReaderT, runReaderT )
+import Control.Monad.Trans.Either   ( EitherT )
 import Data.Int                     ( Int64 )
 import Network.Wai                  ( Application )
 import Database.Persist.Postgresql  ( insert, selectList, Entity(..)
@@ -28,13 +29,13 @@ type QuizAPI =
 quizAPI :: Proxy QuizAPI
 quizAPI = Proxy
 
-listQuizzes :: App [Quiz]
+listQuizzes :: AppM [Quiz]
 listQuizzes = do
     storedQuizzes <- runDb (selectList [] [])
     let quizzes = map entityVal storedQuizzes
     return quizzes
 
-getQuiz :: QuizId -> App Quiz
+getQuiz :: QuizId -> AppM Quiz
 getQuiz quizId = do
     maybeStoredQuiz <- runDb (selectFirst [QuizId ==. quizId] [])
     let maybeQuiz = fmap entityVal maybeStoredQuiz
@@ -42,7 +43,7 @@ getQuiz quizId = do
          Nothing -> throwError err404
          Just quiz -> return quiz
 
-createQuiz :: Quiz -> App Int64
+createQuiz :: Quiz -> AppM Int64
 createQuiz quiz = do
     newQuiz <- runDb (insert (Quiz (quizName quiz) (quizDescription quiz)))
     return $ fromSqlKey newQuiz
@@ -65,7 +66,7 @@ type QuizletAPI =
 quizletAPI :: Proxy QuizletAPI
 quizletAPI = Proxy
 
-listQuizlets :: QuizId -> App [Quizlet]
+listQuizlets :: QuizId -> AppM [Quizlet]
 listQuizlets quizId = do
   storedQuizlets <- runDb (selectList [QuizletQuizId ==. quizId] [])
   let quizlets = map entityVal storedQuizlets
@@ -87,23 +88,44 @@ createQuizlet quizlet = do
 
 -- Wiring:
 
-newtype App a
-    = App
-    { runApp :: ReaderT Config (ExceptT ServantErr IO) a
-    } deriving ( Functor, Applicative, Monad, MonadReader Config,
-                 MonadError ServantErr, MonadIO)
+-- newtype App a
+--     = App
+--     { runApp :: ReaderT Config (ExceptT ServantErr IO) a
+--     } deriving ( Functor, Applicative, Monad, MonadReader Config,
+--                  MonadError ServantErr, MonadIO)
 
-type API = "quizzes" :> QuizAPI
+type API = "quizzes"  :> QuizAPI
       :<|> "quizlets" :> QuizletAPI
 
+-- app :: Config -> Application
+-- app cfg = serve api (readerServer cfg)
+
+-- readerServer :: Config -> Server API
+-- readerServer cfg = enter (convertApp cfg) server
+
+-- convertApp :: Config -> App :~> ExceptT ServantErr IO
+-- convertApp cfg = Nat (flip runReaderT cfg . runApp)
+
+--
+
+type AppM = ReaderT Config (EitherT ServantErr IO)
+
+api :: Proxy API
+api = Proxy
+
+readerToEither :: Config -> AppM :~> EitherT ServantErr IO
+readerToEither config = Nat $ \x -> runReaderT x config
+
+readerServer :: Config -> Server API
+readerServer config = enter (readerToEither config) server
+
 app :: Config -> Application
-app cfg = serve quizAPI (readerServer cfg)
+app config = server api (readerServer config)
 
-readerServer :: Config -> Server QuizAPI
-readerServer cfg = enter (convertApp cfg) server
+-- configuredServer :: Config ->
 
-convertApp :: Config -> App :~> ExceptT ServantErr IO
-convertApp cfg = Nat (flip runReaderT cfg . runApp)
+-- server :: Server API
+-- server = enter configuredServer configuredServerT
 
-server :: ServerT QuizAPI App
-server = listQuizzes :<|> getQuiz :<|> createQuiz
+-- app :: Application
+-- app = serve api server
