@@ -21,7 +21,7 @@ executable quizster-exe
     main-is:
         Main.hs
     build-depends:
-        base >=4.7 && <4.9
+        base >=4.7
       , quizster
       , persistent-postgresql
       , wai
@@ -42,9 +42,8 @@ library
       , Models
       , Api
     build-depends:
-        base >= 4.7 && < 4.9
-      , servant >= 0.5 && < 0.6
-      , servant-server >= 0.5 && < 0.6
+        base >= 4.7
+      , servant-server >= 0.7
       , persistent
       , persistent-postgresql
       , persistent-template
