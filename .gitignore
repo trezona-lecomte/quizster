@@ -31,3 +31,9 @@ cabal.sandbox.config
 *.prof
 *.aux
 *.hp
+elm/elm-stuff/
+elm/src/elm-stuff/
+elm/elm.js
+elm/node_modules/
+elm/src/elm-package.json
+elm/src/Quiz/elm-package.json
