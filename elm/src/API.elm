@@ -38,7 +38,7 @@ getQuizzes =
       , headers =
           [("Content-Type", "application/json")]
       , url =
-          "/" ++ "quizzes"
+          "http://localhost:8081/" ++ "quizzes"
       , body =
           Http.empty
       }
