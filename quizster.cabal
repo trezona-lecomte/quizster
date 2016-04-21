@@ -69,8 +69,6 @@ test-suite servant-persistent-test
     build-depends:
         base
       , quizster
-      -- , QuickCheck
-      -- , hspec
     ghc-option:
         -threaded -rtsopts -with-rtsopts=-N
     default-language:
