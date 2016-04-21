@@ -68,7 +68,7 @@ listQuizzes = do
     let quizzes = map entityVal storedQuizzes
     return quizzes
 
-getQuiz :: (MonadReader Config m, MonadIO m, MonadError ServantErr m) => QuizId -> m Quiz
+getQuiz :: QuizId -> AppM Quiz
 getQuiz quizId = do
     maybeStoredQuiz <- runDb (selectFirst [QuizId ==. quizId] [])
     let maybeQuiz = fmap entityVal maybeStoredQuiz
@@ -76,7 +76,7 @@ getQuiz quizId = do
          Nothing -> throwError err404
          Just quiz -> return quiz
 
-createQuiz :: (MonadReader Config m, MonadIO m) => Quiz -> m Int64
+createQuiz :: Quiz -> AppM Int64
 createQuiz quiz = do
     newQuiz <- runDb (insert (Quiz (quizName quiz) (quizDescription quiz)))
     return $ fromSqlKey newQuiz
@@ -84,13 +84,13 @@ createQuiz quiz = do
 
 -- Quizlet API:
 
-listQuizlets :: (MonadReader Config m, MonadIO m) => QuizId -> m [Quizlet]
+listQuizlets :: QuizId -> AppM [Quizlet]
 listQuizlets quizId = do
   storedQuizlets <- runDb (selectList [QuizletQuizId ==. quizId] [])
   let quizlets = map entityVal storedQuizlets
   return quizlets
 
-getQuizlet :: (MonadReader Config m, MonadIO m, MonadError ServantErr m) => QuizletId -> m Quizlet
+getQuizlet :: QuizletId -> AppM Quizlet
 getQuizlet quizletId = do
   maybeStoredQuizlet <- runDb (selectFirst [QuizletId ==. quizletId] [])
   let maybeQuizlet = fmap entityVal maybeStoredQuizlet
@@ -98,7 +98,7 @@ getQuizlet quizletId = do
     Nothing -> throwError err404
     Just quizlet -> return quizlet
 
-createQuizlet :: (MonadReader Config m, MonadIO m) => Quizlet -> m Int64
+createQuizlet :: Quizlet -> AppM Int64
 createQuizlet quizlet = do
   let q = Quizlet (quizletQuizId quizlet)
                   (quizletQuestion quizlet)
