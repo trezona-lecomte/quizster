@@ -8,6 +8,6 @@ type alias AppModel = { quizzes : List Quiz
                       }
 
 initialModel : AppModel
-initialModel = { quizzes = [ Quiz 0 "Test Quiz" "Boring!" ]
+initialModel = { quizzes = []
                , routing = Routing.initialModel
                }

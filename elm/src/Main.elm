@@ -5,16 +5,21 @@ import Effects exposing (Effects, Never)
 import Task
 import StartApp
 import Routing
+import API exposing (..)
 import Actions exposing (..)
 import Models exposing (..)
 import Update exposing (..)
+import Quiz.Actions exposing (getAllQuizzes)
 import View exposing (..)
-
-import API exposing (..)
 
 
 init : (AppModel, Effects Action)
-init = (initialModel, Effects.none)
+init =
+  let
+    fxs = [ Effects.map QuizAction getAllQuizzes ]
+    fx  = Effects.batch fxs
+  in
+    (Models.initialModel, fx)
 
 app : StartApp.App AppModel
 app =

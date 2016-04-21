@@ -17,6 +17,13 @@ update action model =
       in
         (model.quizzes, Effects.map HopAction (navigateTo path))
 
+    GetQuizzesDone result ->
+      case result of
+        Ok quizzes ->
+          (quizzes, Effects.none)
+        Err error ->
+          (model.quizzes, Effects.none)
+
     EditQuiz id ->
       let
         path = "/quizzes/" ++ (toString id)
