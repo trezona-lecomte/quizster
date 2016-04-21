@@ -18,7 +18,6 @@ import Database.Persist.Postgresql  ( insert
                                     )
 import Network.Wai                  ( Application )
 import Servant
-
 import Config                       ( Config(..) )
 import Models
 

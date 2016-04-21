@@ -4,11 +4,15 @@
 module Main where
 
 import Servant.Elm
-import Elm ( ElmTypeExpr( Primitive ), toElmType, ElmType )
-import Data.Int    ( Int64 )
+import Elm          ( ElmType
+                    , toElmType
+                    , ElmTypeExpr( Primitive )
+                    )
+import Data.Int     ( Int64 )
 import GHC.Generics ( Generic )
 import Models
 import Api
+
 
 instance ElmType Quiz
 instance ElmType Quizlet

@@ -20,7 +20,6 @@ import Control.Monad.Reader.Class
 import Data.Int                    ( Int64 )
 import Database.Persist.Sql
 import Database.Persist.TH
-
 import Config
 
 

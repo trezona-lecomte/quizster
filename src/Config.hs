@@ -2,14 +2,24 @@
 
 module Config where
 
-import Control.Monad.Logger (runNoLoggingT, runStdoutLoggingT)
-import Control.Monad.Trans.Maybe (MaybeT (..), runMaybeT)
+import Control.Monad.Logger                  ( runNoLoggingT
+                                             , runStdoutLoggingT
+                                             )
+import Control.Monad.Trans.Maybe             ( runMaybeT
+                                             , MaybeT (..)
+                                             )
+import Data.Monoid                           ( (<>) )
+import Network.Wai                           ( Middleware )
+import Network.Wai.Middleware.RequestLogger  ( logStdout
+                                             , logStdoutDev
+                                             )
+import System.Environment                    ( lookupEnv )
+import Database.Persist.Postgresql           ( ConnectionPool
+                                             , ConnectionString
+                                             , createPostgresqlPool
+                                             )
 import qualified Data.ByteString.Char8 as BS
-import Data.Monoid ((<>))
-import Network.Wai (Middleware)
-import Network.Wai.Middleware.RequestLogger (logStdout, logStdoutDev)
-import System.Environment (lookupEnv)
-import Database.Persist.Postgresql (ConnectionPool, ConnectionString, createPostgresqlPool)
+
 
 data Config = Config { getPool :: ConnectionPool
                      , getEnv  :: Environment
