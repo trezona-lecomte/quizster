@@ -16,7 +16,7 @@ instance ElmType Quizlet
 instance ElmType Int64 where
     toElmType _ = Primitive "Int"
 
-instance ElmType QuizId where
+instance ElmType StoredQuizId where
     toElmType _ = Primitive "Int"
 
 instance ElmType QuizletId where

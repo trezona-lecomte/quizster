@@ -1,6 +1,6 @@
-{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DataKinds        #-}
 {-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE TypeOperators    #-}
 
 module Api where
 
@@ -8,15 +8,17 @@ import Control.Monad.Except
 import Control.Monad.Reader.Class
 import Control.Monad.Reader         ( ReaderT, runReaderT )
 import Data.Int                     ( Int64 )
-import Network.Wai                  ( Application )
 import Database.Persist.Postgresql  ( insert
                                     , selectList
                                     , selectFirst
                                     , fromSqlKey
+                                    , toSqlKey
                                     , Entity(..)
                                     , (==.)
                                     )
+import Network.Wai                  ( Application )
 import Servant
+
 import Config                       ( Config(..) )
 import Models
 
@@ -73,43 +75,43 @@ readerServerT = listQuizzes
 listQuizzes :: ReaderT Config Handler [Quiz]
 listQuizzes = do
     storedQuizzes <- runDb (selectList [] [])
-    let quizzes = map entityVal storedQuizzes
+    let quizzes = map quizFromDb storedQuizzes
     return quizzes
 
-getQuiz :: QuizId -> AppM Quiz
+getQuiz :: StoredQuizId -> AppM Quiz
 getQuiz quizId = do
-    maybeStoredQuiz <- runDb (selectFirst [QuizId ==. quizId] [])
-    let maybeQuiz = fmap entityVal maybeStoredQuiz
+    maybeStoredQuiz <- runDb (selectFirst [StoredQuizId ==. quizId] [])
+    let maybeQuiz = fmap quizFromDb maybeStoredQuiz
     case maybeQuiz of
          Nothing -> throwError err404
          Just quiz -> return quiz
 
 createQuiz :: Quiz -> AppM Int64
 createQuiz quiz = do
-    newQuiz <- runDb (insert (Quiz (quizName quiz) (quizDescription quiz)))
+    newQuiz <- runDb (insert (StoredQuiz (quizName quiz) (quizDescription quiz)))
     return $ fromSqlKey newQuiz
 
 
 -- Quizlet API:
 
-listQuizlets :: QuizId -> AppM [Quizlet]
+listQuizlets :: StoredQuizId -> AppM [Quizlet]
 listQuizlets quizId = do
-  storedQuizlets <- runDb (selectList [QuizletQuizId ==. quizId] [])
-  let quizlets = map entityVal storedQuizlets
+  storedQuizlets <- runDb (selectList [StoredQuizletStoredQuizId ==. quizId] [])
+  let quizlets = map quizletFromDb storedQuizlets
   return quizlets
 
 getQuizlet :: QuizletId -> AppM Quizlet
 getQuizlet quizletId = do
-  maybeStoredQuizlet <- runDb (selectFirst [QuizletId ==. quizletId] [])
-  let maybeQuizlet = fmap entityVal maybeStoredQuizlet
+  maybeStoredQuizlet <- runDb (selectFirst [StoredQuizletId ==. quizletId] [])
+  let maybeQuizlet = fmap quizletFromDb maybeStoredQuizlet
   case maybeQuizlet of
     Nothing -> throwError err404
     Just quizlet -> return quizlet
 
 createQuizlet :: Quizlet -> AppM Int64
 createQuizlet quizlet = do
-  let q = Quizlet (quizletQuizId quizlet)
-                  (quizletQuestion quizlet)
-                  (quizletAnswer quizlet)
+  let q = StoredQuizlet (toSqlKey $ quizletQuizId quizlet)
+                        (quizletQuestion quizlet)
+                        (quizletAnswer quizlet)
   newQuizlet <- runDb (insert q)
   return $ fromSqlKey newQuizlet

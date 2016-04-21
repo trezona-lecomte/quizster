@@ -74,19 +74,19 @@ library
                   , wai-extra
                   , warp
 
-test-suite servant-persistent-test
-    type:
-        exitcode-stdio-1.0
-    hs-source-dirs:
-        test
-    main-is:
-        Spec.hs
-    other-modules:
-        ApiSpec
-    build-depends:
-                      base
-                  , elm-export >= 0.3.0.0
-                  , quizster
-                  , servant
-    default-language:
-        Haskell2010
+-- test-suite servant-persistent-test
+--     type:
+--         exitcode-stdio-1.0
+--     hs-source-dirs:
+--         test
+--     main-is:
+--         Spec.hs
+--     other-modules:
+--         ApiSpec
+--     build-depends:
+--                       base
+--                   , elm-export >= 0.3.0.0
+--                   , quizster
+--                   , servant
+--     default-language:
+--         Haskell2010
