@@ -21,7 +21,7 @@ view address model =
 nav : Signal.Address Action -> ViewModel -> Html.Html
 nav address model =
   div
-    [ class "clearfix mb2 white bg-black" ]
+    [ class "clearfix mb2 white bg-blue" ]
     [ div [ class "left p2" ] [ text "Quizzes" ] ]
 
 list : Signal.Address Action -> ViewModel -> Html.Html
