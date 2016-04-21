@@ -2,7 +2,9 @@
 
 module Config where
 
-import Control.Monad.Logger                  ( runNoLoggingT
+import Control.Monad.Logger                  ( NoLoggingT
+                                             , LoggingT
+                                             , runNoLoggingT
                                              , runStdoutLoggingT
                                              )
 import Control.Monad.Trans.Maybe             ( runMaybeT
@@ -36,31 +38,33 @@ setLogger Development = logStdoutDev
 setLogger Production = logStdout
 
 makePool :: Environment -> IO ConnectionPool
-makePool Test =
-    runNoLoggingT (createPostgresqlPool (connStr Test) (envPool Test))
-makePool Development =
-    runStdoutLoggingT (createPostgresqlPool (connStr Development) (envPool Development))
-makePool Production = do
-    pool <- runMaybeT $ do
-        let keys = fmap BS.pack
-                   [ "host="
-                   , "port="
-                   , "user="
-                   , "password="
-                   , "dbname="
-                   ]
-            envs = [ "PGHOST"
-                   , "PGPORT"
-                   , "PGUSER"
-                   , "PGPASS"
-                   , "PGDATABASE"
-                   ]
-        envVars <- traverse (MaybeT . lookupEnv) envs
-        let prodStr = mconcat . zipWith (<>) keys . fmap BS.pack $ envVars
-        runStdoutLoggingT $ createPostgresqlPool prodStr (envPool Production)
-    case pool of
-         Nothing -> error "Database Configuration not present in environment."
-         Just a -> return a
+makePool Test        = runNoLoggingT testConnectionPool
+makePool Development = runStdoutLoggingT devConnectionPool
+makePool Production  = do
+  pool <- runMaybeT $ do
+    let keys = fmap BS.pack
+          [ "host="
+          , "port="
+          , "user="
+          , "password="
+          , "dbname="
+          ]
+        envs =
+          [ "PGHOST"
+          , "PGPORT"
+          , "PGUSER"
+          , "PGPASS"
+          , "PGDATABASE"
+          ]
+    envVars <- traverse (MaybeT . lookupEnv) envs
+    let prodStr = mconcat . zipWith (<>) keys . fmap BS.pack $ envVars
+    runStdoutLoggingT $ createPostgresqlPool prodStr (envPool Production)
+  case pool of
+    Nothing -> error "Database Configuration not present in environment."
+    Just a -> return a
+
+testConnectionPool = createPostgresqlPool (connStr Test) (envPool Test)
+devConnectionPool = createPostgresqlPool (connStr Development) (envPool Development)
 
 envPool :: Environment -> Int
 envPool Test = 1
