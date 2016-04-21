@@ -21,14 +21,30 @@ executable quizster-exe
     main-is:
         Main.hs
     build-depends:
-        base >=4.7
-      , quizster
-      , persistent-postgresql
-      , wai
-      , warp
-      , monad-logger
+                    base >=4.7
+                  , elm-export >= 0.3.0.0
+                  , monad-logger
+                  , persistent-postgresql
+                  , quizster
+                  , servant
+                  , wai
+                  , warp
     hs-source-dirs:
         app
+    default-language:
+        Haskell2010
+
+executable elm-generator
+    main-is:
+        Main.hs
+    build-depends:
+                    base >=4.7
+                  , quizster
+                  , servant
+                  , servant-elm
+                  , elm-export >= 0.3.0.0
+    hs-source-dirs:
+        generator
     default-language:
         Haskell2010
 
@@ -42,20 +58,21 @@ library
       , Models
       , Api
     build-depends:
-        base >= 4.7
-      , servant-server >= 0.7
-      , persistent
-      , persistent-postgresql
-      , persistent-template
-      , wai
-      , bytestring
-      , wai-extra
-      , warp
-      , aeson
-      , mtl
-      , monad-logger
-      , transformers
-      , monad-control
+                    base >= 4.7
+                  , aeson
+                  , bytestring
+                  , monad-control
+                  , monad-logger
+                  , mtl
+                  , persistent
+                  , persistent-postgresql
+                  , persistent-template
+                  , servant
+                  , servant-server
+                  , transformers
+                  , wai
+                  , wai-extra
+                  , warp
 
 test-suite servant-persistent-test
     type:
@@ -67,9 +84,9 @@ test-suite servant-persistent-test
     other-modules:
         ApiSpec
     build-depends:
-        base
-      , quizster
-    ghc-option:
-        -threaded -rtsopts -with-rtsopts=-N
+                      base
+                  , elm-export >= 0.3.0.0
+                  , quizster
+                  , servant
     default-language:
         Haskell2010

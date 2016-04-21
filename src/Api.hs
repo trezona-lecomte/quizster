@@ -9,12 +9,15 @@ import Control.Monad.Reader.Class
 import Control.Monad.Reader         ( ReaderT, runReaderT )
 import Data.Int                     ( Int64 )
 import Network.Wai                  ( Application )
-import Database.Persist.Postgresql  ( insert, selectList, Entity(..)
-                                    , fromSqlKey, (==.), selectFirst
+import Database.Persist.Postgresql  ( insert
+                                    , selectList
+                                    , selectFirst
+                                    , fromSqlKey
+                                    , Entity(..)
+                                    , (==.)
                                     )
 import Servant
-
-import Config ( Config(..) )
+import Config                       ( Config(..) )
 import Models
 
 
@@ -37,6 +40,10 @@ type API =
          :> ReqBody '[JSON] Quizlet
          :> Post '[JSON] Int64
 
+-- This is not available in servant-0.5 so define it ourselves:
+type Handler = ExceptT ServantErr IO
+
+-- The context in which our API actions will run:
 type AppM = ReaderT Config Handler
 
 api :: Proxy API
@@ -48,6 +55,7 @@ app config = serve api (readerServer config)
 readerServer :: Config -> Server API
 readerServer config = enter (readerToHandler config) readerServerT
 
+-- Allow the injecting of Config while still returning Handler:
 readerToHandler :: Config -> AppM :~> Handler
 readerToHandler config = Nat $ \x -> runReaderT x config
 
