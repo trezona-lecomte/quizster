@@ -1,4 +1,4 @@
-module Generated.API where
+module API where
 
 import Json.Decode exposing ((:=))
 import Json.Decode.Extra exposing ((|:))
@@ -9,20 +9,23 @@ import Task
 
 
 type alias Quiz =
-  { quizName : String
+  { quizId : Int
+  , quizName : String
   , quizDescription : String
   }
 
 decodeQuiz : Json.Decode.Decoder Quiz
 decodeQuiz =
   Json.Decode.succeed Quiz
+    |: ("quizId" := Json.Decode.int)
     |: ("quizName" := Json.Decode.string)
     |: ("quizDescription" := Json.Decode.string)
 
 encodeQuiz : Quiz -> Json.Encode.Value
 encodeQuiz x =
   Json.Encode.object
-    [ ( "quizName", Json.Encode.string x.quizName )
+    [ ( "quizId", Json.Encode.int x.quizId )
+    , ( "quizName", Json.Encode.string x.quizName )
     , ( "quizDescription", Json.Encode.string x.quizDescription )
     ]
 
@@ -82,7 +85,8 @@ postQuizzes body =
       (Http.send Http.defaultSettings request)
 
 type alias Quizlet =
-  { quizletQuizId : Int
+  { quizletId : Int
+  , quizletQuizId : Int
   , quizletQuestion : String
   , quizletAnswer : String
   }
@@ -90,6 +94,7 @@ type alias Quizlet =
 decodeQuizlet : Json.Decode.Decoder Quizlet
 decodeQuizlet =
   Json.Decode.succeed Quizlet
+    |: ("quizletId" := Json.Decode.int)
     |: ("quizletQuizId" := Json.Decode.int)
     |: ("quizletQuestion" := Json.Decode.string)
     |: ("quizletAnswer" := Json.Decode.string)
@@ -97,7 +102,8 @@ decodeQuizlet =
 encodeQuizlet : Quizlet -> Json.Encode.Value
 encodeQuizlet x =
   Json.Encode.object
-    [ ( "quizletQuizId", Json.Encode.int x.quizletQuizId )
+    [ ( "quizletId", Json.Encode.int x.quizletId )
+    , ( "quizletQuizId", Json.Encode.int x.quizletQuizId )
     , ( "quizletQuestion", Json.Encode.string x.quizletQuestion )
     , ( "quizletAnswer", Json.Encode.string x.quizletAnswer )
     ]

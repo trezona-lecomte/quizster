@@ -1,0 +1,16 @@
+{
+  "name": "quizster",
+  "version": "0.0.1",
+  "description": "Quiz app for the web",
+  "scripts": {
+    "build": "webpack",
+    "watch": "webpack --watch",
+    "dev": "webpack-dev-server --port 3000"
+  },
+  "author": "Kieran Trezona-le Comte",
+  "license": "MIT",
+  "homepage": "https://github.com/trezona-lecomte/quizster#readme",
+  "dependencies": {
+
+  }
+}
