@@ -12,6 +12,7 @@ import Control.Monad.Trans.Maybe             ( runMaybeT
                                              )
 import Data.Monoid                           ( (<>) )
 import Network.Wai                           ( Middleware )
+import Network.Wai.Middleware.Cors
 import Network.Wai.Middleware.RequestLogger  ( logStdout
                                              , logStdoutDev
                                              )
@@ -73,3 +74,18 @@ envPool Production = 8
 
 connStr :: Environment -> ConnectionString
 connStr _ = "host=localhost dbname=quizster user=quizster password=quizster port=5432"
+
+middleware :: Middleware
+middleware = cors $ const (Just corsPolicy)
+
+corsPolicy :: CorsResourcePolicy
+corsPolicy =
+  CorsResourcePolicy { corsOrigins = Nothing -- gives you /*
+                     , corsMethods = ["GET", "POST", "PUT", "DELETE", "HEAD", "OPTION"]
+                     , corsRequestHeaders = simpleHeaders -- adds "Content-Type" to defaults
+                     , corsExposedHeaders = Nothing
+                     , corsMaxAge = Nothing
+                     , corsVaryOrigin = False
+                     , corsRequireOrigin = False
+                     , corsIgnoreFailures = False
+                     }

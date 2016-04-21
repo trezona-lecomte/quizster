@@ -5,8 +5,12 @@ import           Network.Wai.Handler.Warp    (run)
 import           System.Environment          (lookupEnv)
 
 import           Api                         (app)
-import           Config                      (Config (..), Environment (..),
-                                              makePool, setLogger)
+import           Config                      (Config (..)
+                                             , Environment (..)
+                                             , makePool
+                                             , setLogger
+                                             , middleware
+                                             )
 import           Models                      (doMigrations)
 
 
@@ -18,7 +22,7 @@ main = do
     let cfg = Config { getPool = pool, getEnv = env }
         logger = setLogger env
     runSqlPool doMigrations pool
-    run port $ logger $ app cfg
+    run port $ middleware $ app cfg
 
 
 lookupSetting :: Read a => String -> a -> IO a
