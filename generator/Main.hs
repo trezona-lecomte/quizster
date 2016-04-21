@@ -23,9 +23,9 @@ instance ElmType QuizletId where
     toElmType _ = Primitive "Int"
 
 spec :: Spec
-spec = Spec ["Generated", "API"]
-            (defElmImports
-             : generateElmForAPI (Proxy :: Proxy API))
+spec =
+  Spec ["Generated", "API"]
+       (defElmImports : generateElmForAPI (Proxy :: Proxy API))
 
 main :: IO ()
 main = specsToDir [spec] "elm"
