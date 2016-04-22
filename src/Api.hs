@@ -11,6 +11,7 @@ import Data.Int                     ( Int64 )
 import Database.Persist.Postgresql  ( get
                                     , insert
                                     , delete
+                                    , replace
                                     , selectList
                                     , selectFirst
                                     , fromSqlKey
@@ -36,6 +37,10 @@ type API =
   :<|> "quizzes"
          :> Capture "id" QuizId
          :> Delete '[JSON] ()
+  :<|> "quizzes"
+         :> Capture "id" QuizId
+         :> ReqBody '[JSON] Quiz
+         :> Put '[JSON] Quiz
   :<|> "quizzes"
          :> Capture "quizId" QuizId
          :> ( "quizlets" :> Get '[JSON] [Quizlet] )
@@ -70,6 +75,7 @@ readerServerT = listQuizzes
            :<|> getQuiz
            :<|> createQuiz
            :<|> deleteQuiz
+           :<|> updateQuiz
            :<|> listQuizlets
            :<|> getQuizlet
            :<|> createQuizlet
@@ -104,6 +110,11 @@ deleteQuiz :: StoredQuizId -> AppM ()
 deleteQuiz quizId = do
   runDb (delete quizId)
   return ()
+
+updateQuiz :: StoredQuizId -> Quiz -> AppM Quiz
+updateQuiz quizId quiz = do
+  runDb (replace quizId $ StoredQuiz (quizName quiz) (quizDescription quiz))
+  return quiz
 
 -- Quizlet API:
 

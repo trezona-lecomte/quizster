@@ -8,6 +8,7 @@ import API exposing (Quiz
                     , getQuizzes
                     , postQuizzes
                     , deleteQuizzesById
+                    , putQuizzesById
                     )
 import Quiz.Models exposing (QuizId)
 
@@ -21,6 +22,9 @@ type Action = NoOp
             | DeleteQuizIntent Quiz
             | DeleteQuiz QuizId
             | DeleteQuizDone QuizId (Result Http.Error ())
+            | UpdateQuiz Quiz
+            | SendQuizUpdate Quiz
+            | UpdateQuizDone (Result Http.Error Quiz)
             | TaskDone ()
             | HopAction ()
 
@@ -43,4 +47,11 @@ deleteQuiz quizId =
   deleteQuizzesById quizId
     |> Task.toResult
     |> Task.map (DeleteQuizDone quizId)
+    |> Effects.task
+
+updateQuiz : Quiz -> Effects.Effects Action
+updateQuiz quiz =
+  putQuizzesById quiz.quizId quiz
+    |> Task.toResult
+    |> Task.map UpdateQuizDone
     |> Effects.task

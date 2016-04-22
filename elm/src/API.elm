@@ -128,6 +128,25 @@ deleteQuizzesById id =
         `Task.andThen`
           handleResponse (emptyResponseHandler ())
 
+putQuizzesById : Int -> Quiz -> Task.Task Http.Error (Quiz)
+putQuizzesById id body =
+  let
+    request =
+      { verb =
+          "PUT"
+      , headers =
+          [("Content-Type", "application/json")]
+      , url =
+          "http://localhost:8081/" ++ "quizzes"
+          ++ "/" ++ (id |> toString |> Http.uriEncode)
+      , body =
+          Http.string (Json.Encode.encode 0 (encodeQuiz body))
+      }
+  in
+    Http.fromJson
+      decodeQuiz
+      (Http.send Http.defaultSettings request)
+
 type alias Quizlet =
   { quizletId : Int
   , quizletQuizId : Int

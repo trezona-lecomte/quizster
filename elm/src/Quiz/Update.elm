@@ -90,6 +90,56 @@ update action model =
           in
             (model.quizzes, fx)
 
+    UpdateQuiz quiz ->
+      let
+        changeQuiz q =
+          if q.quizId /= quiz.quizId then
+            { q | quizName = quiz.quizName, quizDescription = quiz.quizDescription }
+          else
+            q
+
+        updatedQuizzes =
+          List.map changeQuiz model.quizzes
+      in
+        (updatedQuizzes, Effects.none)
+
+    SendQuizUpdate quiz ->
+      let
+        fxForQuiz q =
+          if q.quizId /= quiz.quizId then
+            Effects.none
+          else
+            updateQuiz quiz
+        fx =
+          List.map fxForQuiz model.quizzes
+            |> Effects.batch
+      in
+        (model.quizzes, fx)
+
+    UpdateQuizDone result ->
+      case result of
+        Ok quiz ->
+          let
+            updatedQuiz existing =
+              if existing.quizId == quiz.quizId then
+                quiz
+              else
+                existing
+
+            updatedQuizzes =
+              List.map updatedQuiz model.quizzes
+          in
+            (updatedQuizzes, Effects.none)
+
+        Err error ->
+          let
+            message = toString error
+            fx = Signal.send model.flashAddress message
+                  |> Effects.task
+                  |> Effects.map TaskDone
+          in
+            (model.quizzes, fx)
+
     EditQuiz id ->
       let
         path = "/quizzes/" ++ (toString id)
