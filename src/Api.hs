@@ -8,7 +8,9 @@ import Control.Monad.Except
 import Control.Monad.Reader.Class
 import Control.Monad.Reader         ( ReaderT, runReaderT )
 import Data.Int                     ( Int64 )
-import Database.Persist.Postgresql  ( insert
+import Database.Persist.Postgresql  ( get
+                                    , insert
+                                    , delete
                                     , selectList
                                     , selectFirst
                                     , fromSqlKey
@@ -30,7 +32,10 @@ type API =
          :> Get '[JSON] Quiz
   :<|> "quizzes"
          :> ReqBody '[JSON] Quiz
-         :> Post '[JSON] Int64
+         :> Post '[JSON] Quiz
+  :<|> "quizzes"
+         :> Capture "id" QuizId
+         :> Delete '[JSON] ()
   :<|> "quizzes"
          :> Capture "quizId" QuizId
          :> ( "quizlets" :> Get '[JSON] [Quizlet] )
@@ -64,6 +69,7 @@ readerServerT :: ServerT API AppM
 readerServerT = listQuizzes
            :<|> getQuiz
            :<|> createQuiz
+           :<|> deleteQuiz
            :<|> listQuizlets
            :<|> getQuizlet
            :<|> createQuizlet
@@ -85,11 +91,19 @@ getQuiz quizId = do
          Nothing -> throwError err404
          Just quiz -> return quiz
 
-createQuiz :: Quiz -> AppM Int64
+createQuiz :: Quiz -> AppM Quiz
 createQuiz quiz = do
-    newQuiz <- runDb (insert (StoredQuiz (quizName quiz) (quizDescription quiz)))
-    return $ fromSqlKey newQuiz
+    newQuizId <- runDb (insert (StoredQuiz (quizName quiz) (quizDescription quiz)))
+    maybeStoredQuiz <- runDb (selectFirst [StoredQuizId ==. newQuizId] [])
+    let maybeQuiz = fmap quizFromDb maybeStoredQuiz
+    case maybeQuiz of
+         Nothing -> throwError err404
+         Just quiz -> return quiz
 
+deleteQuiz :: StoredQuizId -> AppM ()
+deleteQuiz quizId = do
+  runDb (delete quizId)
+  return ()
 
 -- Quizlet API:
 

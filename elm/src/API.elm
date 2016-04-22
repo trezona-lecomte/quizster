@@ -56,7 +56,7 @@ getQuizzesById id =
       , headers =
           [("Content-Type", "application/json")]
       , url =
-          "/" ++ "quizzes"
+          "http://localhost:8081/" ++ "quizzes"
           ++ "/" ++ (id |> toString |> Http.uriEncode)
       , body =
           Http.empty
@@ -66,7 +66,7 @@ getQuizzesById id =
       decodeQuiz
       (Http.send Http.defaultSettings request)
 
-postQuizzes : Quiz -> Task.Task Http.Error (Int)
+postQuizzes : Quiz -> Task.Task Http.Error (Quiz)
 postQuizzes body =
   let
     request =
@@ -75,14 +75,58 @@ postQuizzes body =
       , headers =
           [("Content-Type", "application/json")]
       , url =
-          "/" ++ "quizzes"
+          "http://localhost:8081/" ++ "quizzes"
       , body =
           Http.string (Json.Encode.encode 0 (encodeQuiz body))
       }
   in
     Http.fromJson
-      Json.Decode.int
+      decodeQuiz
       (Http.send Http.defaultSettings request)
+
+emptyResponseHandler : a -> String -> Task.Task Http.Error a
+emptyResponseHandler x str =
+  if str == "[]" then
+    Task.succeed x
+  else
+    Task.fail (Http.UnexpectedPayload str)
+
+handleResponse : (String -> Task.Task Http.Error a) -> Http.Response -> Task.Task Http.Error a
+handleResponse handle response =
+  if 200 <= response.status && response.status < 300 then
+    case response.value of
+      Http.Text str ->
+        handle str
+      _ ->
+        Task.fail (Http.UnexpectedPayload "Response body is a blob, expecting a string.")
+  else
+    Task.fail (Http.BadResponse response.status response.statusText)
+
+promoteError : Http.RawError -> Http.Error
+promoteError rawError =
+  case rawError of
+    Http.RawTimeout -> Http.Timeout
+    Http.RawNetworkError -> Http.NetworkError
+
+deleteQuizzesById : Int -> Task.Task Http.Error (())
+deleteQuizzesById id =
+  let
+    request =
+      { verb =
+          "DELETE"
+      , headers =
+          [("Content-Type", "application/json")]
+      , url =
+          "http://localhost:8081/" ++ "quizzes"
+          ++ "/" ++ (id |> toString |> Http.uriEncode)
+      , body =
+          Http.empty
+      }
+  in
+    Task.mapError promoteError
+      (Http.send Http.defaultSettings request)
+        `Task.andThen`
+          handleResponse (emptyResponseHandler ())
 
 type alias Quizlet =
   { quizletId : Int
