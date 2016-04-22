@@ -24,7 +24,7 @@ init =
 app : StartApp.App AppModel
 app =
   StartApp.start { init = init
-                 , inputs = [ routerSignal ]
+                 , inputs = [ routerSignal, actionsMailbox.signal ]
                  , update = update
                  , view = view
                  }

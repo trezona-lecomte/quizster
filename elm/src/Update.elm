@@ -30,5 +30,8 @@ update action model =
         , Effects.map QuizAction fx
         )
 
+    ShowFlashMessage message ->
+      ( { model | flashMessage = message }, Effects.none )
+
     NoOp ->
       (model, Effects.none)

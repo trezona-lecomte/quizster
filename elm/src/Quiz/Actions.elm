@@ -12,6 +12,7 @@ type Action = NoOp
             | EditQuiz QuizId
             | ListQuizzes
             | GetQuizzesDone (Result Http.Error (List Quiz))
+            | TaskDone ()
             | HopAction ()
 
 getAllQuizzes : Effects.Effects Action
