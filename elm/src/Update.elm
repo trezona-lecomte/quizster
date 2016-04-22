@@ -2,6 +2,7 @@ module Update (..) where
 
 import Models exposing (..)
 import Actions exposing (..)
+import Mailboxes exposing (..)
 import Effects exposing (Effects)
 import Routing
 import Quiz.Update
@@ -20,8 +21,12 @@ update action model =
 
     QuizAction quizAction ->
       let
-        updatedModel =
-          { quizzes = model.quizzes }
+        updatedModel = { quizzes = model.quizzes
+                       , flashAddress = Signal.forwardTo
+                                          actionsMailbox.address
+                                          ShowFlashMessage
+                       , confirmationAddress = confirmationsMailbox.address
+                       }
 
         (updatedQuizzes, fx) =
           Quiz.Update.update quizAction updatedModel

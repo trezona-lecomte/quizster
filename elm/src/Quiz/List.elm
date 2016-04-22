@@ -22,7 +22,9 @@ nav : Signal.Address Action -> ViewModel -> Html.Html
 nav address model =
   div
     [ class "clearfix mb2 white bg-blue" ]
-    [ div [ class "left p2" ] [ text "Quizzes" ] ]
+    [ div [ class "left p2" ] [ text "Quizzes" ]
+    , div [ class "right p1" ] [ addButton address model ]
+    ]
 
 list : Signal.Address Action -> ViewModel -> Html.Html
 list address model =
@@ -54,7 +56,19 @@ quizRow address model quiz =
     , td [] [ text quiz.quizName ]
     , td [] [ text quiz.quizDescription ]
     , td [] [ text (toString 9000) ]
-    , td [] [ editButton address quiz ]
+    , td [] [ editButton address quiz
+            , deleteButton address quiz
+            ]
+    ]
+
+addButton : Signal.Address Action -> ViewModel -> Html.Html
+addButton address model =
+  button
+    [ class "btn"
+    , onClick address CreateQuiz
+    ]
+    [ i [ class "fa fa-plus mr1" ] []
+    , text "New Quiz"
     ]
 
 editButton : Signal.Address Action -> Quiz -> Html.Html
@@ -63,4 +77,16 @@ editButton address quiz =
     [ class "btn regular"
     , onClick address (EditQuiz quiz.quizId)
     ]
-    [ i [ class "fa fa-pencil mr1" ] [], text "Edit" ]
+    [ i [ class "fa fa-pencil mr1" ] []
+    , text "Edit"
+    ]
+
+deleteButton : Signal.Address Action -> Quiz -> Html.Html
+deleteButton address quiz =
+  button
+    [ class "btn regular mr1"
+    , onClick address (DeleteQuizIntent quiz)
+    ]
+    [ i [ class "fa fa-trash mr1" ] []
+    , text "Delete"
+    ]

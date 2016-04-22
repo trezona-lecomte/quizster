@@ -7,6 +7,7 @@ import StartApp
 import Routing
 import API exposing (..)
 import Actions exposing (..)
+import Mailboxes exposing (..)
 import Models exposing (..)
 import Update exposing (..)
 import Quiz.Actions exposing (getAllQuizzes)
@@ -24,7 +25,10 @@ init =
 app : StartApp.App AppModel
 app =
   StartApp.start { init = init
-                 , inputs = [ routerSignal, actionsMailbox.signal ]
+                 , inputs = [ routerSignal
+                            , actionsMailbox.signal
+                            , getConfirmationsSignal
+                            ]
                  , update = update
                  , view = view
                  }
@@ -37,6 +41,16 @@ routerSignal : Signal Action
 routerSignal =
   Signal.map RoutingAction Routing.signal
 
+getConfirmationsSignal : Signal Actions.Action
+getConfirmationsSignal =
+  let
+    toAction id =
+      id
+        |> Quiz.Actions.DeleteQuiz
+        |> QuizAction
+  in
+    Signal.map toAction getConfirmations
+
 port runner : Signal (Task.Task Never ())
 port runner =
   app.tasks
@@ -44,3 +58,9 @@ port runner =
 port routeRunTask : Task.Task () ()
 port routeRunTask =
   Routing.run
+
+port confirmations : Signal (Int, String)
+port confirmations =
+  confirmationsMailbox.signal
+
+port getConfirmations : Signal Int
