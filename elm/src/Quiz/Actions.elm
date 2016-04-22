@@ -22,8 +22,7 @@ type Action = NoOp
             | DeleteQuizIntent Quiz
             | DeleteQuiz QuizId
             | DeleteQuizDone QuizId (Result Http.Error ())
-            | UpdateQuiz Quiz
-            | SendQuizUpdate Quiz
+            | ChangeQuizName QuizId String
             | UpdateQuizDone (Result Http.Error Quiz)
             | TaskDone ()
             | HopAction ()

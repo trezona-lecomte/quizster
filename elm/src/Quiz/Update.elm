@@ -90,31 +90,22 @@ update action model =
           in
             (model.quizzes, fx)
 
-    UpdateQuiz quiz ->
+    ChangeQuizName quizId newName ->
       let
-        changeQuiz q =
-          if q.quizId /= quiz.quizId then
-            { q | quizName = quiz.quizName, quizDescription = quiz.quizDescription }
-          else
-            q
-
-        updatedQuizzes =
-          List.map changeQuiz model.quizzes
-      in
-        (updatedQuizzes, Effects.none)
-
-    SendQuizUpdate quiz ->
-      let
-        fxForQuiz q =
-          if q.quizId /= quiz.quizId then
+        fxForQuiz quiz =
+          if quiz.quizId /= quizId then
             Effects.none
           else
-            updateQuiz quiz
+            let
+              updatedQuiz =
+                { quiz | quizName = newName }
+            in
+              updateQuiz updatedQuiz
         fx =
           List.map fxForQuiz model.quizzes
             |> Effects.batch
       in
-        (model.quizzes, fx)
+        ( model.quizzes, fx )
 
     UpdateQuizDone result ->
       case result of
@@ -126,19 +117,20 @@ update action model =
               else
                 existing
 
-            updatedQuizzes =
+            updatedCollection =
               List.map updatedQuiz model.quizzes
           in
-            (updatedQuizzes, Effects.none)
-
+            ( updatedCollection, Effects.none )
         Err error ->
           let
-            message = toString error
-            fx = Signal.send model.flashAddress message
-                  |> Effects.task
-                  |> Effects.map TaskDone
+            message =
+              toString error
+            fx =
+              Signal.send model.flashAddress message
+                |> Effects.task
+                |> Effects.map TaskDone
           in
-            (model.quizzes, fx)
+            ( model.quizzes, fx )
 
     EditQuiz id ->
       let
