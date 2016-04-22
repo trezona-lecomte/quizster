@@ -14,32 +14,41 @@ import Quiz.Actions exposing (getAllQuizzes)
 import View exposing (..)
 
 
-init : (AppModel, Effects Action)
+init : ( AppModel, Effects Action )
 init =
   let
-    fxs = [ Effects.map QuizAction getAllQuizzes ]
-    fx  = Effects.batch fxs
+    fxs =
+      [ Effects.map QuizAction getAllQuizzes ]
+
+    fx =
+      Effects.batch fxs
   in
-    (Models.initialModel, fx)
+    ( Models.initialModel, fx )
+
 
 app : StartApp.App AppModel
 app =
-  StartApp.start { init = init
-                 , inputs = [ routerSignal
-                            , actionsMailbox.signal
-                            , getConfirmationsSignal
-                            ]
-                 , update = update
-                 , view = view
-                 }
+  StartApp.start
+    { init = init
+    , inputs =
+        [ routerSignal
+        , actionsMailbox.signal
+        , getConfirmationsSignal
+        ]
+    , update = update
+    , view = view
+    }
+
 
 main : Signal.Signal Html
 main =
   app.html
 
+
 routerSignal : Signal Action
 routerSignal =
   Signal.map RoutingAction Routing.signal
+
 
 getConfirmationsSignal : Signal Actions.Action
 getConfirmationsSignal =
@@ -51,16 +60,20 @@ getConfirmationsSignal =
   in
     Signal.map toAction getConfirmations
 
+
 port runner : Signal (Task.Task Never ())
 port runner =
   app.tasks
+
 
 port routeRunTask : Task.Task () ()
 port routeRunTask =
   Routing.run
 
-port confirmations : Signal (Int, String)
+
+port confirmations : Signal ( Int, String )
 port confirmations =
   confirmationsMailbox.signal
+
 
 port getConfirmations : Signal Int

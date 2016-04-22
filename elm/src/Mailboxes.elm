@@ -7,6 +7,7 @@ actionsMailbox : Signal.Mailbox Action
 actionsMailbox =
   Signal.mailbox NoOp
 
-confirmationsMailbox : Signal.Mailbox (Int, String)
+
+confirmationsMailbox : Signal.Mailbox ( Int, String )
 confirmationsMailbox =
-  Signal.mailbox (0, "")
+  Signal.mailbox ( 0, "" )

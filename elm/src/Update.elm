@@ -7,12 +7,13 @@ import Effects exposing (Effects)
 import Routing
 import Quiz.Update
 
-update : Action -> AppModel -> (AppModel, Effects Action)
+
+update : Action -> AppModel -> ( AppModel, Effects Action )
 update action model =
   case (Debug.log "action" action) of
     RoutingAction routingAction ->
       let
-        (updatedRouting, fx) =
+        ( updatedRouting, fx ) =
           Routing.update routingAction model.routing
       in
         ( { model | routing = updatedRouting }
@@ -21,14 +22,16 @@ update action model =
 
     QuizAction quizAction ->
       let
-        updatedModel = { quizzes = model.quizzes
-                       , flashAddress = Signal.forwardTo
-                                          actionsMailbox.address
-                                          ShowFlashMessage
-                       , confirmationAddress = confirmationsMailbox.address
-                       }
+        updatedModel =
+          { quizzes = model.quizzes
+          , flashAddress =
+              Signal.forwardTo
+                actionsMailbox.address
+                ShowFlashMessage
+          , confirmationAddress = confirmationsMailbox.address
+          }
 
-        (updatedQuizzes, fx) =
+        ( updatedQuizzes, fx ) =
           Quiz.Update.update quizAction updatedModel
       in
         ( { model | quizzes = updatedQuizzes }
@@ -39,4 +42,4 @@ update action model =
       ( { model | flashMessage = message }, Effects.none )
 
     NoOp ->
-      (model, Effects.none)
+      ( model, Effects.none )

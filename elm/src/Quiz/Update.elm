@@ -1,4 +1,4 @@
-module Quiz.Update  (..) where
+module Quiz.Update (..) where
 
 import Effects exposing (Effects)
 import Hop.Navigate exposing (navigateTo)
@@ -7,67 +7,83 @@ import API exposing (Quiz)
 import Quiz.Actions exposing (..)
 import Quiz.Models exposing (..)
 
-type alias UpdateModel = { quizzes : List Quiz
-                         , flashAddress : Signal.Address String
-                         , confirmationAddress : Signal.Address (QuizId, String)
-                         }
 
-update : Action -> UpdateModel -> (List Quiz, Effects Action)
+type alias UpdateModel =
+  { quizzes : List Quiz
+  , flashAddress : Signal.Address String
+  , confirmationAddress : Signal.Address ( QuizId, String )
+  }
+
+
+update : Action -> UpdateModel -> ( List Quiz, Effects Action )
 update action model =
   case action of
     ListQuizzes ->
       let
-        path = "/quizzes/"
+        path =
+          "/quizzes/"
       in
-        (model.quizzes, Effects.map HopAction (navigateTo path))
+        ( model.quizzes, Effects.map HopAction (navigateTo path) )
 
     GetQuizzesDone result ->
       case result of
         Ok quizzes ->
-          (quizzes, Effects.none)
+          ( quizzes, Effects.none )
+
         Err error ->
           let
-            flashMessage = toString error
-            fx = Signal.send model.flashAddress flashMessage
-                  |> Effects.task
-                  |> Effects.map TaskDone
+            flashMessage =
+              toString error
+
+            fx =
+              Signal.send model.flashAddress flashMessage
+                |> Effects.task
+                |> Effects.map TaskDone
           in
-            (model.quizzes, fx)
+            ( model.quizzes, fx )
 
     CreateQuiz ->
-      (model.quizzes, createQuiz new)
+      ( model.quizzes, createQuiz new )
 
     CreateQuizDone result ->
       case result of
         Ok quiz ->
           let
-            updatedQuizzes = quiz :: model.quizzes
-            fx = Task.succeed (EditQuiz quiz.quizId)
-                  |> Effects.task
+            updatedQuizzes =
+              quiz :: model.quizzes
+
+            fx =
+              Task.succeed (EditQuiz quiz.quizId)
+                |> Effects.task
           in
-            (updatedQuizzes, fx)
+            ( updatedQuizzes, fx )
+
         Err error ->
           let
-            flashMessage = toString error
-            fx = Signal.send model.flashAddress flashMessage
-                  |> Effects.task
-                  |> Effects.map TaskDone
+            flashMessage =
+              toString error
+
+            fx =
+              Signal.send model.flashAddress flashMessage
+                |> Effects.task
+                |> Effects.map TaskDone
           in
-            (model.quizzes, fx)
+            ( model.quizzes, fx )
 
     DeleteQuizIntent quiz ->
       let
         msg =
           "Are you sure you want to delete " ++ quiz.quizName ++ "?"
+
         fx =
-          Signal.send model.confirmationAddress (quiz.quizId, msg)
+          Signal.send model.confirmationAddress ( quiz.quizId, msg )
             |> Effects.task
             |> Effects.map TaskDone
       in
-        (model.quizzes, fx)
+        ( model.quizzes, fx )
 
     DeleteQuiz quizId ->
-      (model.quizzes, deleteQuiz quizId)
+      ( model.quizzes, deleteQuiz quizId )
 
     DeleteQuizDone quizId result ->
       case result of
@@ -79,16 +95,19 @@ update action model =
             updatedQuizzes =
               List.filter notDeleted model.quizzes
           in
-            (updatedQuizzes, Effects.none)
+            ( updatedQuizzes, Effects.none )
+
         Err error ->
           let
             message =
               toString error
-            fx = Signal.send model.flashAddress message
-                  |> Effects.task
-                  |> Effects.map TaskDone
+
+            fx =
+              Signal.send model.flashAddress message
+                |> Effects.task
+                |> Effects.map TaskDone
           in
-            (model.quizzes, fx)
+            ( model.quizzes, fx )
 
     ChangeQuizName quizId newName ->
       let
@@ -101,6 +120,7 @@ update action model =
                 { quiz | quizName = newName }
             in
               updateQuiz updatedQuiz
+
         fx =
           List.map fxForQuiz model.quizzes
             |> Effects.batch
@@ -121,10 +141,12 @@ update action model =
               List.map updatedQuiz model.quizzes
           in
             ( updatedCollection, Effects.none )
+
         Err error ->
           let
             message =
               toString error
+
             fx =
               Signal.send model.flashAddress message
                 |> Effects.task
@@ -134,15 +156,16 @@ update action model =
 
     EditQuiz id ->
       let
-        path = "/quizzes/" ++ (toString id)
+        path =
+          "/quizzes/" ++ (toString id)
       in
-        (model.quizzes, Effects.map HopAction (navigateTo path))
+        ( model.quizzes, Effects.map HopAction (navigateTo path) )
 
     TaskDone () ->
-      (model.quizzes, Effects.none)
+      ( model.quizzes, Effects.none )
 
     HopAction _ ->
-      (model.quizzes, Effects.none)
+      ( model.quizzes, Effects.none )
 
     NoOp ->
-      (model.quizzes, Effects.none)
+      ( model.quizzes, Effects.none )

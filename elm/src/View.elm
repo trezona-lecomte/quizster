@@ -10,16 +10,19 @@ import Quiz.Models exposing (QuizId)
 import Quiz.List exposing (view)
 import Quiz.View
 
+
 view : Signal.Address Action -> AppModel -> Html
 view address model =
   let
-    _ = Debug.log "model" model
+    _ =
+      Debug.log "model" model
   in
     div
       []
       [ flash address model
       , page address model
       ]
+
 
 flash address model =
   if String.isEmpty model.flashMessage then
@@ -28,6 +31,7 @@ flash address model =
     div
       [ class "bold center p2 mb2 white bg-red rounded" ]
       [ text model.flashMessage ]
+
 
 page : Signal.Address Action -> AppModel -> Html.Html
 page address model =
@@ -41,12 +45,15 @@ page address model =
     Routing.NotFoundRoute ->
       notFoundView
 
+
 quizzesPage : Signal.Address Action -> AppModel -> Html.Html
 quizzesPage address model =
   let
-    viewModel = { quizzes = model.quizzes }
+    viewModel =
+      { quizzes = model.quizzes }
   in
     Quiz.List.view (Signal.forwardTo address QuizAction) viewModel
+
 
 quizPage : Signal.Address Action -> AppModel -> QuizId -> Html.Html
 quizPage address model quizId =
@@ -59,13 +66,16 @@ quizPage address model quizId =
     case maybeQuiz of
       Just quiz ->
         let
-          viewModel = { quiz = quiz }
+          viewModel =
+            { quiz = quiz }
         in
           Quiz.View.view (Signal.forwardTo address QuizAction) viewModel
+
       Nothing ->
         notFoundView
 
-notFoundView :Html.Html
+
+notFoundView : Html.Html
 notFoundView =
   div
     []

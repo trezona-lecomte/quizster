@@ -8,7 +8,9 @@ import Quiz.Models exposing (..)
 import Quiz.Actions exposing (..)
 
 
-type alias ViewModel = { quiz : Quiz }
+type alias ViewModel =
+  { quiz : Quiz }
+
 
 view : Signal.Address Action -> ViewModel -> Html.Html
 view address model =
@@ -18,11 +20,13 @@ view address model =
     , form address model
     ]
 
+
 nav : Signal.Address Action -> ViewModel -> Html.Html
 nav address model =
   div
     [ class "clearfix mb2 white bg-blue p1" ]
     [ listButton address model ]
+
 
 listButton : Signal.Address Action -> ViewModel -> Html.Html
 listButton address model =
@@ -34,6 +38,7 @@ listButton address model =
     , text "All Quizzes"
     ]
 
+
 form : Signal.Address Action -> ViewModel -> Html.Html
 form address model =
   div
@@ -41,6 +46,7 @@ form address model =
     [ h1 [] [ text model.quiz.quizName ]
     , nameForm address model
     ]
+
 
 nameForm : Signal.Address Action -> ViewModel -> Html.Html
 nameForm address model =
@@ -53,17 +59,24 @@ nameForm address model =
         [ nameInput address model ]
     ]
 
+
 nameInput : Signal.Address Action -> ViewModel -> Html.Html
 nameInput address model =
   input
     [ class "field-light"
     , value model.quiz.quizName
-    , on "change" targetValue
-        (\newName -> Signal.message address
-           (ChangeQuizName model.quiz.quizId newName)
+    , on
+        "change"
+        targetValue
+        (\newName ->
+          Signal.message
+            address
+            (ChangeQuizName model.quiz.quizId newName)
         )
     ]
     []
+
+
 
 -- inputDescription : Signal.Address Action -> ViewModel -> Html.Html
 -- inputDescription address model =
@@ -76,13 +89,3 @@ nameInput address model =
 --         )
 --     ]
 --     []
-
--- updateButton : Signal.Address Action -> ViewModel -> Html.Html
--- updateButton address model =
---   button
---     [ class "btn btn-regular"
---     , onClick address (SendQuizUpdate model.quiz)
---     ]
---     [ i [ class "fa pencil mr1" ] []
---     , text "Update Quiz"
---     ]

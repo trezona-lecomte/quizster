@@ -1,4 +1,4 @@
-module Quiz.List  (..) where
+module Quiz.List (..) where
 
 import Html exposing (..)
 import Html.Attributes exposing (class)
@@ -6,9 +6,14 @@ import Html.Events exposing (onClick)
 import Quiz.Actions exposing (..)
 import API exposing (Quiz)
 
-type alias ViewModel = { quizzes : List Quiz }
 
-type alias RenderHtml = Signal.Address Action -> ViewModel -> Html.Html
+type alias ViewModel =
+  { quizzes : List Quiz }
+
+
+type alias RenderHtml =
+  Signal.Address Action -> ViewModel -> Html.Html
+
 
 view : Signal.Address Action -> ViewModel -> Html.Html
 view address model =
@@ -18,6 +23,7 @@ view address model =
     , list address model
     ]
 
+
 nav : Signal.Address Action -> ViewModel -> Html.Html
 nav address model =
   div
@@ -26,27 +32,29 @@ nav address model =
     , div [ class "right p1" ] [ addButton address model ]
     ]
 
+
 list : Signal.Address Action -> ViewModel -> Html.Html
 list address model =
   div
     []
     [ table
-      [ class "table-light" ]
-      [ thead
-        []
-        [ tr
-          []
-          [ th [] [ text "Id" ]
-          , th [] [ text "Name" ]
-          , th [] [ text "Description" ]
-          , th [] [ text "High Score" ]
-          ]
+        [ class "table-light" ]
+        [ thead
+            []
+            [ tr
+                []
+                [ th [] [ text "Id" ]
+                , th [] [ text "Name" ]
+                , th [] [ text "Description" ]
+                , th [] [ text "High Score" ]
+                ]
+            ]
+        , tbody
+            []
+            (List.map (quizRow address model) model.quizzes)
         ]
-      , tbody
-          []
-          (List.map (quizRow address model) model.quizzes)
-      ]
     ]
+
 
 quizRow : Signal.Address Action -> ViewModel -> Quiz -> Html.Html
 quizRow address model quiz =
@@ -56,10 +64,13 @@ quizRow address model quiz =
     , td [] [ text quiz.quizName ]
     , td [] [ text quiz.quizDescription ]
     , td [] [ text (toString 9000) ]
-    , td [] [ editButton address quiz
-            , deleteButton address quiz
-            ]
+    , td
+        []
+        [ editButton address quiz
+        , deleteButton address quiz
+        ]
     ]
+
 
 addButton : Signal.Address Action -> ViewModel -> Html.Html
 addButton address model =
@@ -71,6 +82,7 @@ addButton address model =
     , text "New Quiz"
     ]
 
+
 editButton : Signal.Address Action -> Quiz -> Html.Html
 editButton address quiz =
   button
@@ -80,6 +92,7 @@ editButton address quiz =
     [ i [ class "fa fa-pencil mr1" ] []
     , text "Edit"
     ]
+
 
 deleteButton : Signal.Address Action -> Quiz -> Html.Html
 deleteButton address quiz =
