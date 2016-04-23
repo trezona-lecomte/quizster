@@ -12,6 +12,7 @@ import Quiz.Models exposing (QuizId)
 type Route
   = QuizzesRoute
   | QuizRoute QuizId
+  | AttemptQuizRoute QuizId
   | NotFoundRoute
 
 
@@ -103,11 +104,17 @@ quizMatcher =
   match2 QuizRoute "/quizzes/" int
 
 
+attemptQuizMatcher : PathMatcher Route
+attemptQuizMatcher =
+  match3 AttemptQuizRoute "/quizzes/" int "/attempt"
+
+
 matchers : List (PathMatcher Route)
 matchers =
   [ indexMatcher
   , quizzesMatcher
   , quizMatcher
+  , attemptQuizMatcher
   ]
 
 

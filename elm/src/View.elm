@@ -9,6 +9,7 @@ import Routing
 import Quiz.Models exposing (QuizId)
 import Quiz.List exposing (view)
 import Quiz.Edit
+import Quiz.Attempt
 
 
 view : Signal.Address Action -> AppModel -> Html
@@ -51,6 +52,9 @@ page address model =
     Routing.QuizRoute quizId ->
       quizPage address model quizId
 
+    Routing.AttemptQuizRoute quizId ->
+      attemptQuizPage address model quizId
+
     Routing.NotFoundRoute ->
       notFoundView
 
@@ -78,7 +82,27 @@ quizPage address model quizId =
           viewModel =
             { quiz = quiz }
         in
-          Quiz.View.view (Signal.forwardTo address QuizAction) viewModel
+          Quiz.Edit.view (Signal.forwardTo address QuizAction) viewModel
+
+      Nothing ->
+        notFoundView
+
+
+attemptQuizPage : Signal.Address Action -> AppModel -> QuizId -> Html.Html
+attemptQuizPage address model quizId =
+  let
+    maybeQuiz =
+      model.quizzes
+        |> List.filter (\quiz -> quiz.quizId == quizId)
+        |> List.head
+  in
+    case maybeQuiz of
+      Just quiz ->
+        let
+          viewModel =
+            { quiz = quiz }
+        in
+          Quiz.Attempt.view (Signal.forwardTo address QuizAction) viewModel
 
       Nothing ->
         notFoundView

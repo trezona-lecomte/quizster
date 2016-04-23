@@ -10,6 +10,7 @@ import Quiz.Models exposing (QuizId)
 
 type Action
   = NoOp
+  | AttemptQuiz QuizId
   | EditQuiz QuizId
   | ListQuizzes
   | GetQuizzesDone (Result Http.Error (List Quiz))
