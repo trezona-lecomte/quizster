@@ -18,6 +18,13 @@ type alias UpdateModel =
 update : Action -> UpdateModel -> ( List Quiz, Effects Action )
 update action model =
   case action of
+    EditQuiz id ->
+      let
+        path =
+          "/quizzes/" ++ (toString id)
+      in
+        ( model.quizzes, Effects.map HopAction (navigateTo path) )
+
     ListQuizzes ->
       let
         path =
