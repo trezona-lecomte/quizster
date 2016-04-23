@@ -3,8 +3,9 @@ module Quiz.List (..) where
 import Html exposing (..)
 import Html.Attributes exposing (class)
 import Html.Events exposing (onClick)
-import Quiz.Actions exposing (..)
 import API exposing (Quiz)
+import Quiz.Navigation exposing (..)
+import Quiz.Actions exposing (..)
 
 
 type alias ViewModel =
@@ -19,17 +20,8 @@ view : Signal.Address Action -> ViewModel -> Html.Html
 view address model =
   div
     []
-    [ nav address model
+    [ navbar address
     , list address model
-    ]
-
-
-nav : Signal.Address Action -> ViewModel -> Html.Html
-nav address model =
-  div
-    [ class "clearfix mb2 white bg-blue" ]
-    [ div [ class "left p2" ] [ text "Quizzes" ]
-    , div [ class "right p1" ] [ addButton address model ]
     ]
 
 

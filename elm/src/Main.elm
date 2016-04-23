@@ -5,7 +5,6 @@ import Effects exposing (Effects, Never)
 import Task
 import StartApp
 import Routing
-import API exposing (..)
 import Actions exposing (..)
 import Mailboxes exposing (..)
 import Models exposing (..)

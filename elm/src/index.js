@@ -1,7 +1,5 @@
 'use strict';
 
-require('basscss/css/basscss.css');
-require('font-awesome/css/font-awesome.css');
 
 // Ensure index.html is copied to dist:
 require('./index.html');
