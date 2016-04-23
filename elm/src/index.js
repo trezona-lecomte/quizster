@@ -1,5 +1,7 @@
 'use strict';
 
+require('bulma/custom_styles.css');
+require('font-awesome/css/font-awesome.css');
 require('../img/QuizsterLogo.png');
 
 // Ensure index.html is copied to dist:
