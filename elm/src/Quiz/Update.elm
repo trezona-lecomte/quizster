@@ -127,6 +127,24 @@ update action model =
       in
         ( model.quizzes, fx )
 
+    ChangeQuizDescription quizId newDescription ->
+      let
+        fxForQuiz quiz =
+          if quiz.quizId /= quizId then
+            Effects.none
+          else
+            let
+              updatedQuiz =
+                { quiz | quizDescription = newDescription }
+            in
+              updateQuiz updatedQuiz
+
+        fx =
+          List.map fxForQuiz model.quizzes
+            |> Effects.batch
+      in
+        ( model.quizzes, fx )
+
     UpdateQuizDone result ->
       case result of
         Ok quiz ->
@@ -153,13 +171,6 @@ update action model =
                 |> Effects.map TaskDone
           in
             ( model.quizzes, fx )
-
-    EditQuiz id ->
-      let
-        path =
-          "/quizzes/" ++ (toString id)
-      in
-        ( model.quizzes, Effects.map HopAction (navigateTo path) )
 
     TaskDone () ->
       ( model.quizzes, Effects.none )

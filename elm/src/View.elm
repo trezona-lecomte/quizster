@@ -8,7 +8,7 @@ import Models exposing (..)
 import Routing
 import Quiz.Models exposing (QuizId)
 import Quiz.List exposing (view)
-import Quiz.View
+import Quiz.Edit
 
 
 view : Signal.Address Action -> AppModel -> Html
@@ -18,9 +18,18 @@ view address model =
       Debug.log "model" model
   in
     div
-      []
-      [ flash address model
-      , page address model
+      [ class "" ]
+      [ div
+          [ class "" ]
+          []
+      , div
+          [ class "" ]
+          [ flash address model
+          , page address model
+          ]
+      , div
+          [ class "" ]
+          []
       ]
 
 

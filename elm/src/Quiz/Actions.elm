@@ -20,6 +20,7 @@ type Action
   | DeleteQuizDone QuizId (Result Http.Error ())
   | ChangeQuizName QuizId String
   | UpdateQuizDone (Result Http.Error Quiz)
+  | ChangeQuizDescription QuizId String
   | TaskDone ()
   | HopAction ()
 
