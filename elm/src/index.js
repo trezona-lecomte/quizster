@@ -1,5 +1,6 @@
 'use strict';
 
+require('../img/QuizsterLogo.png');
 
 // Ensure index.html is copied to dist:
 require('./index.html');

@@ -10,7 +10,8 @@
   "author": "Kieran Trezona-le Comte",
   "license": "MIT",
   "homepage": "https://github.com/trezona-lecomte/quizster#readme",
-  "dependencies": {
-
+  "dependencies": {},
+  "devDependencies": {
+    "image-webpack-loader": "^1.7.0"
   }
 }
