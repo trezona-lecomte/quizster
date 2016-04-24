@@ -1,8 +1,8 @@
 module Quiz.Actions (..) where
 
 import Effects
-import Task
 import Http
+import Task
 import Hop
 import API exposing (Quiz, getQuizzes, postQuizzes, deleteQuizzesById, putQuizzesById)
 import Quiz.Models exposing (QuizId)
@@ -10,9 +10,11 @@ import Quiz.Models exposing (QuizId)
 
 type Action
   = NoOp
+  | TaskDone ()
+  | HopAction ()
   | AttemptQuiz QuizId
   | EditQuiz QuizId
-  | ListQuizzes
+  | GetQuizzes
   | GetQuizzesDone (Result Http.Error (List Quiz))
   | CreateQuiz
   | CreateQuizDone (Result Http.Error Quiz)
@@ -22,8 +24,6 @@ type Action
   | ChangeQuizName QuizId String
   | UpdateQuizDone (Result Http.Error Quiz)
   | ChangeQuizDescription QuizId String
-  | TaskDone ()
-  | HopAction ()
 
 
 getAllQuizzes : Effects.Effects Action

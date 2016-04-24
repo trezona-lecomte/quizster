@@ -14,7 +14,7 @@ navbar address =
         [ class "navbar-item has-text-centered" ]
         [ a
             [ class "link"
-            , onClick address ListQuizzes
+            , onClick address GetQuizzes
             ]
             [ text "Home" ]
         ]
@@ -22,7 +22,7 @@ navbar address =
         [ class "navbar-item has-text-centered" ]
         [ a
             [ class "link"
-            , onClick address ListQuizzes
+            , onClick address GetQuizzes
             ]
             [ text "Menu" ]
         ]
@@ -46,7 +46,7 @@ navbar address =
         [ class "navbar-item has-text-centered" ]
         [ a
             [ class "link"
-            , onClick address ListQuizzes
+            , onClick address GetQuizzes
             ]
             [ text "Contact" ]
         ]

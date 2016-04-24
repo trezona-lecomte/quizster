@@ -85,7 +85,7 @@ descriptionInput address model =
 submitButton address model =
   button
     [ class "button is-primary"
-    , onClick address ListQuizzes
+    , onClick address GetQuizzes
     ]
     [ text "Done" ]
 

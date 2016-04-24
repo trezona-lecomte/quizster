@@ -33,7 +33,7 @@ update action model =
       in
         ( model.quizzes, Effects.map HopAction (navigateTo path) )
 
-    ListQuizzes ->
+    GetQuizzes ->
       let
         path =
           "/quizzes/"
