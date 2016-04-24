@@ -3,21 +3,24 @@ module Quiz.Attempt (..) where
 import Html exposing (..)
 import Html.Attributes exposing (class, value, href, type', placeholder)
 import Html.Events exposing (on, onClick, targetValue)
-import API exposing (Quiz)
+import API exposing (Quiz, Quizlet)
 import Quiz.Navigation exposing (..)
 import Quiz.Models exposing (..)
-import Quiz.Actions exposing (..)
+import Actions exposing (..)
+import Quizlet.View
 
 
 type alias ViewModel =
-  { quiz : Quiz }
+  { quiz : Quiz
+  , quizlets : List Quizlet
+  }
 
 
 view : Signal.Address Action -> ViewModel -> Html.Html
 view address model =
   div
     []
-    [ navbar address
+    [ navbar (Signal.forwardTo address QuizAction)
     , div
         [ class "columns" ]
         [ div
@@ -25,9 +28,26 @@ view address model =
             []
         , div
             [ class "column is-10" ]
-            [ text "content here" ]
+            [ Quizlet.View.view
+                (Signal.forwardTo address QuizletAction)
+                { quizlet = (currentQuizlet model) }
+            ]
         , div
             [ class "column is-1" ]
             []
         ]
     ]
+
+
+currentQuizlet : ViewModel -> Quizlet
+currentQuizlet model =
+  let
+    maybeQuizlet =
+      List.head model.quizlets
+  in
+    case maybeQuizlet of
+      Just quizlet ->
+        quizlet
+
+      Nothing ->
+        Quizlet 0 model.quiz.quizId "" ""

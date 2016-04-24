@@ -100,9 +100,11 @@ attemptQuizPage address model quizId =
       Just quiz ->
         let
           viewModel =
-            { quiz = quiz }
+            { quiz = quiz
+            , quizlets = model.quizlets
+            }
         in
-          Quiz.Attempt.view (Signal.forwardTo address QuizAction) viewModel
+          Quiz.Attempt.view address viewModel
 
       Nothing ->
         notFoundView

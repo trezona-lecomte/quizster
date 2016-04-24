@@ -6,6 +6,7 @@ import Mailboxes exposing (..)
 import Effects exposing (Effects)
 import Routing
 import Quiz.Update
+import Quizlet.Update
 
 
 update : Action -> AppModel -> ( AppModel, Effects Action )
@@ -24,6 +25,7 @@ update action model =
       let
         updatedModel =
           { quizzes = model.quizzes
+          , quizlets = model.quizlets
           , flashAddress =
               Signal.forwardTo
                 actionsMailbox.address
@@ -36,6 +38,25 @@ update action model =
       in
         ( { model | quizzes = updatedQuizzes }
         , Effects.map QuizAction fx
+        )
+
+    QuizletAction quizletAction ->
+      let
+        updatedModel =
+          { quizzes = model.quizzes
+          , quizlets = model.quizlets
+          , flashAddress =
+              Signal.forwardTo
+                actionsMailbox.address
+                ShowFlashMessage
+          , confirmationAddress = confirmationsMailbox.address
+          }
+
+        ( updatedQuizlets, fx ) =
+          Quizlet.Update.update quizletAction updatedModel
+      in
+        ( { model | quizlets = updatedQuizlets }
+        , Effects.map QuizletAction fx
         )
 
     ShowFlashMessage message ->

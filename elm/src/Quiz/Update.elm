@@ -10,6 +10,7 @@ import Quiz.Models exposing (..)
 
 type alias UpdateModel =
   { quizzes : List Quiz
+  , quizlets : List Quizlet
   , flashAddress : Signal.Address String
   , confirmationAddress : Signal.Address ( QuizId, String )
   }
