@@ -12,10 +12,6 @@ type alias ViewModel =
   { quizzes : List Quiz }
 
 
-type alias RenderHtml =
-  Signal.Address Action -> ViewModel -> Html.Html
-
-
 view : Signal.Address Action -> ViewModel -> Html.Html
 view address model =
   div
