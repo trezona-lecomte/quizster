@@ -43,13 +43,11 @@ update action model =
     QuizletAction quizletAction ->
       let
         updatedModel =
-          { quizzes = model.quizzes
-          , quizlets = model.quizlets
+          { quizlets = model.quizlets
           , flashAddress =
               Signal.forwardTo
                 actionsMailbox.address
                 ShowFlashMessage
-          , confirmationAddress = confirmationsMailbox.address
           }
 
         ( updatedQuizlets, fx ) =
