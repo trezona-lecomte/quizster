@@ -4,7 +4,7 @@ import Effects
 import Http
 import Task
 import Hop
-import API exposing (Quiz, getQuizzes, postQuizzes, deleteQuizzesById, putQuizzesById)
+import API exposing (Quiz, Quizlet, getQuizzes, postQuizzes, deleteQuizzesById, putQuizzesById, getQuizzesByQuizIdQuizlets)
 import Quiz.Models exposing (QuizId)
 
 
@@ -12,8 +12,6 @@ type Action
   = NoOp
   | TaskDone ()
   | HopAction ()
-  | AttemptQuiz QuizId
-  | EditQuiz QuizId
   | GetQuizzes
   | GetQuizzesDone (Result Http.Error (List Quiz))
   | CreateQuiz
@@ -24,6 +22,10 @@ type Action
   | ChangeQuizName QuizId String
   | UpdateQuizDone (Result Http.Error Quiz)
   | ChangeQuizDescription QuizId String
+  | AttemptQuiz QuizId
+  | EditQuiz QuizId
+  | GetQuizlets QuizId
+  | GetQuizletsDone (Result Http.Error (List Quizlet))
 
 
 getAllQuizzes : Effects.Effects Action
@@ -55,4 +57,12 @@ updateQuiz quiz =
   putQuizzesById quiz.quizId quiz
     |> Task.toResult
     |> Task.map UpdateQuizDone
+    |> Effects.task
+
+
+getQuizlets : QuizId -> Effects.Effects Action
+getQuizlets quizId =
+  getQuizzesByQuizIdQuizlets quizId
+    |> Task.toResult
+    |> Task.map GetQuizletsDone
     |> Effects.task

@@ -3,7 +3,7 @@ module Quiz.Update (..) where
 import Effects exposing (Effects)
 import Hop.Navigate exposing (navigateTo)
 import Task
-import API exposing (Quiz)
+import API exposing (Quiz, Quizlet)
 import Quiz.Actions exposing (..)
 import Quiz.Models exposing (..)
 
@@ -16,34 +16,20 @@ type alias UpdateModel =
   }
 
 
-update : Action -> UpdateModel -> ( List Quiz, Effects Action )
+update : Action -> UpdateModel -> ( List Quiz, List Quizlet, Effects Action )
 update action model =
   case action of
-    AttemptQuiz id ->
+    GetQuizlets id ->
       let
-        path =
-          "/quizzes/" ++ (toString id) ++ "/attempt"
+        fx =
+          getQuizlets id
       in
-        ( model.quizzes, Effects.map HopAction (navigateTo path) )
+        ( model.quizzes, model.quizlets, fx )
 
-    EditQuiz id ->
-      let
-        path =
-          "/quizzes/" ++ (toString id)
-      in
-        ( model.quizzes, Effects.map HopAction (navigateTo path) )
-
-    GetQuizzes ->
-      let
-        path =
-          "/quizzes/"
-      in
-        ( model.quizzes, Effects.map HopAction (navigateTo path) )
-
-    GetQuizzesDone result ->
+    GetQuizletsDone result ->
       case result of
-        Ok quizzes ->
-          ( quizzes, Effects.none )
+        Ok quizlets ->
+          ( model.quizzes, quizlets, Effects.none )
 
         Err error ->
           let
@@ -55,10 +41,54 @@ update action model =
                 |> Effects.task
                 |> Effects.map TaskDone
           in
-            ( model.quizzes, fx )
+            ( model.quizzes, model.quizlets, fx )
+
+    AttemptQuiz id ->
+      let
+        path =
+          "/quizzes/" ++ (toString id) ++ "/attempt"
+      in
+        ( model.quizzes, model.quizlets, Effects.map HopAction (navigateTo path) )
+
+    EditQuiz id ->
+      let
+        path =
+          "/quizzes/" ++ (toString id)
+
+        fx =
+          Effects.batch
+            [ getQuizlets id
+            , Effects.map HopAction (navigateTo path)
+            ]
+      in
+        ( model.quizzes, model.quizlets, fx )
+
+    GetQuizzes ->
+      let
+        path =
+          "/quizzes/"
+      in
+        ( model.quizzes, model.quizlets, Effects.map HopAction (navigateTo path) )
+
+    GetQuizzesDone result ->
+      case result of
+        Ok quizzes ->
+          ( quizzes, model.quizlets, Effects.none )
+
+        Err error ->
+          let
+            flashMessage =
+              toString error
+
+            fx =
+              Signal.send model.flashAddress flashMessage
+                |> Effects.task
+                |> Effects.map TaskDone
+          in
+            ( model.quizzes, model.quizlets, fx )
 
     CreateQuiz ->
-      ( model.quizzes, createQuiz new )
+      ( model.quizzes, model.quizlets, createQuiz new )
 
     CreateQuizDone result ->
       case result of
@@ -71,7 +101,7 @@ update action model =
               Task.succeed (EditQuiz quiz.quizId)
                 |> Effects.task
           in
-            ( updatedQuizzes, fx )
+            ( updatedQuizzes, model.quizlets, fx )
 
         Err error ->
           let
@@ -83,7 +113,7 @@ update action model =
                 |> Effects.task
                 |> Effects.map TaskDone
           in
-            ( model.quizzes, fx )
+            ( model.quizzes, model.quizlets, fx )
 
     DeleteQuizIntent quiz ->
       let
@@ -95,10 +125,10 @@ update action model =
             |> Effects.task
             |> Effects.map TaskDone
       in
-        ( model.quizzes, fx )
+        ( model.quizzes, model.quizlets, fx )
 
     DeleteQuiz quizId ->
-      ( model.quizzes, deleteQuiz quizId )
+      ( model.quizzes, model.quizlets, deleteQuiz quizId )
 
     DeleteQuizDone quizId result ->
       case result of
@@ -110,7 +140,7 @@ update action model =
             updatedQuizzes =
               List.filter notDeleted model.quizzes
           in
-            ( updatedQuizzes, Effects.none )
+            ( updatedQuizzes, model.quizlets, Effects.none )
 
         Err error ->
           let
@@ -122,7 +152,7 @@ update action model =
                 |> Effects.task
                 |> Effects.map TaskDone
           in
-            ( model.quizzes, fx )
+            ( model.quizzes, model.quizlets, fx )
 
     ChangeQuizName quizId newName ->
       let
@@ -140,7 +170,7 @@ update action model =
           List.map fxForQuiz model.quizzes
             |> Effects.batch
       in
-        ( model.quizzes, fx )
+        ( model.quizzes, model.quizlets, fx )
 
     ChangeQuizDescription quizId newDescription ->
       let
@@ -158,7 +188,7 @@ update action model =
           List.map fxForQuiz model.quizzes
             |> Effects.batch
       in
-        ( model.quizzes, fx )
+        ( model.quizzes, model.quizlets, fx )
 
     UpdateQuizDone result ->
       case result of
@@ -173,7 +203,7 @@ update action model =
             updatedCollection =
               List.map updatedQuiz model.quizzes
           in
-            ( updatedCollection, Effects.none )
+            ( updatedCollection, model.quizlets, Effects.none )
 
         Err error ->
           let
@@ -185,13 +215,13 @@ update action model =
                 |> Effects.task
                 |> Effects.map TaskDone
           in
-            ( model.quizzes, fx )
+            ( model.quizzes, model.quizlets, fx )
 
     TaskDone () ->
-      ( model.quizzes, Effects.none )
+      ( model.quizzes, model.quizlets, Effects.none )
 
     HopAction _ ->
-      ( model.quizzes, Effects.none )
+      ( model.quizzes, model.quizlets, Effects.none )
 
     NoOp ->
-      ( model.quizzes, Effects.none )
+      ( model.quizzes, model.quizlets, Effects.none )

@@ -80,7 +80,9 @@ quizPage address model quizId =
       Just quiz ->
         let
           viewModel =
-            { quiz = quiz }
+            { quiz = quiz
+            , quizlets = model.quizlets
+            }
         in
           Quiz.Edit.view (Signal.forwardTo address QuizAction) viewModel
 

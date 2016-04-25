@@ -33,10 +33,10 @@ update action model =
           , confirmationAddress = confirmationsMailbox.address
           }
 
-        ( updatedQuizzes, fx ) =
+        ( updatedQuizzes, updatedQuizlets, fx ) =
           Quiz.Update.update quizAction updatedModel
       in
-        ( { model | quizzes = updatedQuizzes }
+        ( { model | quizzes = updatedQuizzes, quizlets = updatedQuizlets }
         , Effects.map QuizAction fx
         )
 
