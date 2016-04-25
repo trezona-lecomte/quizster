@@ -1,4 +1,4 @@
-module API where
+module API (..) where
 
 import Json.Decode exposing ((:=))
 import Json.Decode.Extra exposing ((|:))
@@ -14,12 +14,14 @@ type alias Quiz =
   , quizDescription : String
   }
 
+
 decodeQuiz : Json.Decode.Decoder Quiz
 decodeQuiz =
   Json.Decode.succeed Quiz
     |: ("quizId" := Json.Decode.int)
     |: ("quizName" := Json.Decode.string)
     |: ("quizDescription" := Json.Decode.string)
+
 
 encodeQuiz : Quiz -> Json.Encode.Value
 encodeQuiz x =
@@ -29,6 +31,7 @@ encodeQuiz x =
     , ( "quizDescription", Json.Encode.string x.quizDescription )
     ]
 
+
 getQuizzes : Task.Task Http.Error (List (Quiz))
 getQuizzes =
   let
@@ -36,7 +39,7 @@ getQuizzes =
       { verb =
           "GET"
       , headers =
-          [("Content-Type", "application/json")]
+          [ ( "Content-Type", "application/json" ) ]
       , url =
           "http://localhost:8081/" ++ "quizzes"
       , body =
@@ -47,6 +50,7 @@ getQuizzes =
       (Json.Decode.list decodeQuiz)
       (Http.send Http.defaultSettings request)
 
+
 getQuizzesById : Int -> Task.Task Http.Error (Quiz)
 getQuizzesById id =
   let
@@ -54,10 +58,12 @@ getQuizzesById id =
       { verb =
           "GET"
       , headers =
-          [("Content-Type", "application/json")]
+          [ ( "Content-Type", "application/json" ) ]
       , url =
-          "http://localhost:8081/" ++ "quizzes"
-          ++ "/" ++ (id |> toString |> Http.uriEncode)
+          "http://localhost:8081/"
+            ++ "quizzes"
+            ++ "/"
+            ++ (id |> toString |> Http.uriEncode)
       , body =
           Http.empty
       }
@@ -65,6 +71,7 @@ getQuizzesById id =
     Http.fromJson
       decodeQuiz
       (Http.send Http.defaultSettings request)
+
 
 postQuizzes : Quiz -> Task.Task Http.Error (Quiz)
 postQuizzes body =
@@ -73,7 +80,7 @@ postQuizzes body =
       { verb =
           "POST"
       , headers =
-          [("Content-Type", "application/json")]
+          [ ( "Content-Type", "application/json" ) ]
       , url =
           "http://localhost:8081/" ++ "quizzes"
       , body =
@@ -83,6 +90,7 @@ postQuizzes body =
     Http.fromJson
       decodeQuiz
       (Http.send Http.defaultSettings request)
+
 
 emptyResponseHandler : a -> String -> Task.Task Http.Error a
 emptyResponseHandler x str =
@@ -91,42 +99,52 @@ emptyResponseHandler x str =
   else
     Task.fail (Http.UnexpectedPayload str)
 
+
 handleResponse : (String -> Task.Task Http.Error a) -> Http.Response -> Task.Task Http.Error a
 handleResponse handle response =
   if 200 <= response.status && response.status < 300 then
     case response.value of
       Http.Text str ->
         handle str
+
       _ ->
         Task.fail (Http.UnexpectedPayload "Response body is a blob, expecting a string.")
   else
     Task.fail (Http.BadResponse response.status response.statusText)
 
+
 promoteError : Http.RawError -> Http.Error
 promoteError rawError =
   case rawError of
-    Http.RawTimeout -> Http.Timeout
-    Http.RawNetworkError -> Http.NetworkError
+    Http.RawTimeout ->
+      Http.Timeout
 
-deleteQuizzesById : Int -> Task.Task Http.Error (())
+    Http.RawNetworkError ->
+      Http.NetworkError
+
+
+deleteQuizzesById : Int -> Task.Task Http.Error ()
 deleteQuizzesById id =
   let
     request =
       { verb =
           "DELETE"
       , headers =
-          [("Content-Type", "application/json")]
+          [ ( "Content-Type", "application/json" ) ]
       , url =
-          "http://localhost:8081/" ++ "quizzes"
-          ++ "/" ++ (id |> toString |> Http.uriEncode)
+          "http://localhost:8081/"
+            ++ "quizzes"
+            ++ "/"
+            ++ (id |> toString |> Http.uriEncode)
       , body =
           Http.empty
       }
   in
-    Task.mapError promoteError
+    Task.mapError
+      promoteError
       (Http.send Http.defaultSettings request)
-        `Task.andThen`
-          handleResponse (emptyResponseHandler ())
+      `Task.andThen` handleResponse (emptyResponseHandler ())
+
 
 putQuizzesById : Int -> Quiz -> Task.Task Http.Error (Quiz)
 putQuizzesById id body =
@@ -135,10 +153,12 @@ putQuizzesById id body =
       { verb =
           "PUT"
       , headers =
-          [("Content-Type", "application/json")]
+          [ ( "Content-Type", "application/json" ) ]
       , url =
-          "http://localhost:8081/" ++ "quizzes"
-          ++ "/" ++ (id |> toString |> Http.uriEncode)
+          "http://localhost:8081/"
+            ++ "quizzes"
+            ++ "/"
+            ++ (id |> toString |> Http.uriEncode)
       , body =
           Http.string (Json.Encode.encode 0 (encodeQuiz body))
       }
@@ -147,12 +167,14 @@ putQuizzesById id body =
       decodeQuiz
       (Http.send Http.defaultSettings request)
 
+
 type alias Quizlet =
   { quizletId : Int
   , quizletQuizId : Int
   , quizletQuestion : String
   , quizletAnswer : String
   }
+
 
 decodeQuizlet : Json.Decode.Decoder Quizlet
 decodeQuizlet =
@@ -161,6 +183,7 @@ decodeQuizlet =
     |: ("quizletQuizId" := Json.Decode.int)
     |: ("quizletQuestion" := Json.Decode.string)
     |: ("quizletAnswer" := Json.Decode.string)
+
 
 encodeQuizlet : Quizlet -> Json.Encode.Value
 encodeQuizlet x =
@@ -171,6 +194,7 @@ encodeQuizlet x =
     , ( "quizletAnswer", Json.Encode.string x.quizletAnswer )
     ]
 
+
 getQuizzesByQuizIdQuizlets : Int -> Task.Task Http.Error (List (Quizlet))
 getQuizzesByQuizIdQuizlets quizId =
   let
@@ -178,11 +202,14 @@ getQuizzesByQuizIdQuizlets quizId =
       { verb =
           "GET"
       , headers =
-          [("Content-Type", "application/json")]
+          [ ( "Content-Type", "application/json" ) ]
       , url =
-          "/" ++ "quizzes"
-          ++ "/" ++ (quizId |> toString |> Http.uriEncode)
-          ++ "/" ++ "quizlets"
+          "http://localhost:8081/"
+            ++ "quizzes"
+            ++ "/"
+            ++ (quizId |> toString |> Http.uriEncode)
+            ++ "/"
+            ++ "quizlets"
       , body =
           Http.empty
       }
@@ -191,6 +218,7 @@ getQuizzesByQuizIdQuizlets quizId =
       (Json.Decode.list decodeQuizlet)
       (Http.send Http.defaultSettings request)
 
+
 getQuizletsById : Int -> Task.Task Http.Error (Quizlet)
 getQuizletsById id =
   let
@@ -198,10 +226,12 @@ getQuizletsById id =
       { verb =
           "GET"
       , headers =
-          [("Content-Type", "application/json")]
+          [ ( "Content-Type", "application/json" ) ]
       , url =
-          "/" ++ "quizlets"
-          ++ "/" ++ (id |> toString |> Http.uriEncode)
+          "/"
+            ++ "quizlets"
+            ++ "/"
+            ++ (id |> toString |> Http.uriEncode)
       , body =
           Http.empty
       }
@@ -210,6 +240,7 @@ getQuizletsById id =
       decodeQuizlet
       (Http.send Http.defaultSettings request)
 
+
 postQuizlets : Quizlet -> Task.Task Http.Error (Int)
 postQuizlets body =
   let
@@ -217,7 +248,7 @@ postQuizlets body =
       { verb =
           "POST"
       , headers =
-          [("Content-Type", "application/json")]
+          [ ( "Content-Type", "application/json" ) ]
       , url =
           "/" ++ "quizlets"
       , body =
