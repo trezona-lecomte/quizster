@@ -14,24 +14,24 @@ import Quiz.Attempt
 
 view : Signal.Address Action -> AppModel -> Html
 view address model =
-  let
-    _ =
-      Debug.log "model" model
-  in
-    div
-      [ class "" ]
-      [ div
-          [ class "" ]
-          []
-      , div
-          [ class "" ]
-          [ flash address model
-          , page address model
-          ]
-      , div
-          [ class "" ]
-          []
-      ]
+  -- let
+  -- _ =
+  --   Debug.log "model" model
+  -- in
+  div
+    [ class "" ]
+    [ div
+        [ class "" ]
+        []
+    , div
+        [ class "" ]
+        [ flash address model
+        , page address model
+        ]
+    , div
+        [ class "" ]
+        []
+    ]
 
 
 flash address model =
